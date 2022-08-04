@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class MusicTagController extends Controller
 {
-
     public function update(Request $request)
     {
         $this->validate($request, [
@@ -20,12 +20,14 @@ class MusicTagController extends Controller
         ]);
 
         $data = $request->all();
-        $filepath = storage_path('musics' . DIRECTORY_SEPARATOR . time() . '-' . substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 0, 5));
+        $fileId = time() . '-' . substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 0, 5);
+        $filepath = storage_path('musics' . DIRECTORY_SEPARATOR . $fileId);
         $music_file = $request->file('music');
-        $new_name = "{$data['artist']}-{$data['track_number']}{$data['title']}.{$music_file->extension()}";
+        $ext = $music_file->extension();
+        $new_name = "{$data['artist']} - {$data['track_number']} {$data['title']}.{$music_file->extension()}";
         $res = $music_file->move($filepath, $new_name);
         $uploaded_path = $res->getPathname();
-        // dd($uploaded_path);
+
 
 
         $TaggingFormat = 'UTF-8';
@@ -50,14 +52,30 @@ class MusicTagController extends Controller
         $tag_writer->tag_data = $TagData;
         // write tags
         if ($tag_writer->WriteTags()) {
-            
-            return response()->download($filepath . DIRECTORY_SEPARATOR . $new_name);
-            
+
+            return response()->json([
+                "status" => true,
+                "dlUrl" => route('dl', ['id' => $fileId])
+            ]);
         } else {
             return response()->json([
                 "status" => false,
                 "errors" => 'Failed to write tags!<br>' . implode('<br><br>', $tag_writer->errors)
             ]);
+        }
+    }
+
+
+    public function download($id)
+    {
+        $dir = storage_path('musics' . DIRECTORY_SEPARATOR . $id);
+        $files = glob($dir.'/*.*');
+        
+        if (file_exists($files[0])) {
+            $headers = [
+                'Content-Type' => 'audio/mpeg'
+            ];
+            return response()->download($files[0]);
         }
     }
 }
