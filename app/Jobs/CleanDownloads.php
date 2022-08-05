@@ -30,8 +30,10 @@ class CleanDownloads extends Job
             foreach ($expired_downloads as $file) {
                 if (file_exists($file->path)) {
                     unlink($file->path);
+                    $fileDir = storage_path("downloads". DIRECTORY_SEPARATOR . $file->fileID);
+                    rmdir($fileDir);
                 }
-
+                
                 $file->delete();
             }
         }

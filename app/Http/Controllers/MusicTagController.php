@@ -102,8 +102,9 @@ class MusicTagController extends Controller
             $res = Storage::disk('local')->move($oldPath, $newPath);
             if ($res) {
                 Download::create([
-                    'path' => $newPath,
-                    'valid_until' => Carbon::now()->addMinutes(5)
+                    'path' => storage_path($newPath),
+                    'valid_until' => Carbon::now()->addMinutes(5),
+                    'fileID' => $data['fileID'],
                 ]);
             }
 

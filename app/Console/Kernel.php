@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(new CleanUploads)->everyFiveMinutes();
-        $schedule->job(new CleanDownloads)->everyFiveMinutes();
+        $schedule->job(new CleanUploads)->everyMinute();
+        $schedule->job(new CleanDownloads)->everyMinute();
     }
 }

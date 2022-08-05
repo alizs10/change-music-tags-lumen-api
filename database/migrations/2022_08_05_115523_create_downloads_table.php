@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('downloads', function (Blueprint $table) {
             $table->id();
             $table->text('path');
+            $table->string('fileID');
             $table->timestamp('valid_until');
             $table->timestamps();
         });

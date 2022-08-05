@@ -31,7 +31,7 @@ class CleanUploads extends Job
                 if (file_exists($file->path)) {
                     unlink($file->path);
                 }
-
+                
                 $file->delete();
             }
         }
