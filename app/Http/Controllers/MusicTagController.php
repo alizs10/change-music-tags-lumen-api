@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Download;
+use App\Models\Upload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,9 +22,15 @@ class MusicTagController extends Controller
         $fileID = time() . '-' . substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 0, 5);
         $fileName = "{$fileID}.{$music_file->extension()}";
         $filePath = storage_path("uploads");
-        $res = $music_file->move($filePath, $fileName);
+        $uploadPath = $music_file->move($filePath, $fileName);
 
-        if ($res) {
+        if ($uploadPath) {
+
+            Upload::create([
+                "path" => $uploadPath,
+                "vali_until" => Carbon::now()->addMinutes(5)
+            ]);
+
             return response()->json([
                 "status" => "success",
                 "fileID" => $fileID,
@@ -29,8 +38,7 @@ class MusicTagController extends Controller
         }
 
         return response()->json([
-            "status" => "unsuccess",
-            "result" => $res,
+            "status" => "unsuccess"
         ]);
     }
 
@@ -48,7 +56,7 @@ class MusicTagController extends Controller
 
         $dir = storage_path('uploads');
         $files = glob($dir . '/*.*');
-        
+
         if (count($files) == 0) {
             return response()->json([
                 "status" => false,
@@ -92,12 +100,18 @@ class MusicTagController extends Controller
             $newPath = $newPath . DIRECTORY_SEPARATOR . $newName;
 
             $res = Storage::disk('local')->move($oldPath, $newPath);
+            if ($res) {
+                Download::create([
+                    'path' => $newPath,
+                    'valid_until' => Carbon::now()->addMinutes(5)
+                ]);
+            }
+
 
             return response()->json([
                 "status" => "success",
                 "dlUrl" => route('download', ['id' => $data['fileID']]),
             ]);
-
         } else {
             return response()->json([
                 "status" => false,

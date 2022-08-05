@@ -8,6 +8,6 @@ class Download extends Model
 {
     
     protected $fillable = [
-        'path', 'valid_unti',
+        'path', 'valid_until',
     ];
 }
