@@ -13,5 +13,6 @@
 |
 */
 
-$router->post('/api/update-tags',['as' => 'update', 'uses' => 'MusicTagController@update']);
-$router->get('/api/download-file/{id}',['as' => 'dl', 'uses' => 'MusicTagController@download']);
+$router->post('/api/upload',['as' => 'upload', 'uses' => 'MusicTagController@upload']);
+$router->post('/api/update',['as' => 'update', 'uses' => 'MusicTagController@update']);
+$router->get('/api/download/{id}',['as' => 'download', 'uses' => 'MusicTagController@download']);
