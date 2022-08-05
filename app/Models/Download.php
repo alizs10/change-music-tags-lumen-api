@@ -10,4 +10,7 @@ class Download extends Model
     protected $fillable = [
         'path', 'valid_until',
     ];
+
+    protected $timestamp = ['valid_until'];
+
 }
