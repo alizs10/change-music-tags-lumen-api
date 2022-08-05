@@ -52,10 +52,11 @@ class MusicTagController extends Controller
             "genre" => "required|string|max:90|min:1",
             "year" => "required|integer|max:2050|min:1800",
             "track_number" => "required|integer|max:1000|min:0",
+            "cover" => "nullable|image|mimes:jpg,jpeg",
         ]);
 
         $dir = storage_path('uploads');
-        $files = glob($dir . '/*.*');
+        $files = glob($dir . "/$request->fileID.*");
 
         if (count($files) == 0) {
             return response()->json([
@@ -86,6 +87,28 @@ class MusicTagController extends Controller
         $TagData['year'][] = $data['year'];
         $TagData['track_number'][] = $data['track_number'];
         $TagData['genre'][] = $data['genre'];
+        
+
+        //set cover art
+        if ($request->has('cover')) {
+
+            $pictureFile = file_get_contents($request->file('cover')->getRealPath());
+            $fd = fopen($request->file('cover')->getRealPath(), 'rb');
+            $APICdata = fread($fd, filesize($request->file('cover')->getRealPath()));
+            fclose($fd);
+
+            if ($APICdata) {
+                $TagData += array(
+                    'attached_picture' => array(0 => array(
+                        'data'          => $APICdata,
+                        'picturetypeid' => '03',
+                        'description'   => 'cover',
+                        'mime'          => "image/jpeg"
+                    ))
+                );
+            }
+        }
+
         $tag_writer->tag_data = $TagData;
         // write tags
         if ($tag_writer->WriteTags()) {
