@@ -28,7 +28,7 @@ class MusicTagController extends Controller
 
             Upload::create([
                 "path" => $uploadPath,
-                "vali_until" => Carbon::now()->addMinutes(5)
+                "valid_until" => Carbon::now()->addMinutes(5)
             ]);
 
             return response()->json([
