@@ -93,11 +93,10 @@ class MusicTagController extends Controller
 
             $res = Storage::disk('local')->move($oldPath, $newPath);
 
-            return  redirect()->route('download', ['id' => $data['fileID']]);
-            // return response()->json([
-            //     "status" => "success",
-            //     "res" => $res
-            // ]);
+            return response()->json([
+                "status" => "success",
+                "dlUrl" => route('download', ['id' => $data['fileID']]),
+            ]);
 
         } else {
             return response()->json([
